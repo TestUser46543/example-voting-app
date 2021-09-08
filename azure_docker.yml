@@ -1,3 +1,4 @@
+
 ---
 - name : Install Docker
   hosts: localhost
@@ -83,7 +84,35 @@
     debug:
       msg: "Container Output: {{hello_world_output.stdout}}"
 
-  - name: Reboot Azure VM
-    shell: "sleep 1 && reboot"
-    async: 1
-    poll: 0
+  - name: Finding System name 
+    shell: uname -s 
+    register: system_name
+
+  - name: Finding Machine Architecture
+    shell: uname -m
+    register: machine_arch
+
+  - name: Download docker-compose
+    get_url:
+      url : https://github.com/docker/compose/releases/download/{{ DOCKER_COMPOSE_VERSION }}/docker-compose-{{ system_name.stdout }}-{{ machine_arch.stdout }}
+      dest: ~/docker-compose
+      mode: '+x'
+
+  - name: Check docker-compose exists
+    stat: path=~/docker-compose
+    register: docker_compose
+
+  - name: Move docker-compose to /usr/local/bin/docker-compose
+    command: mv ~/docker-compose /usr/local/bin/docker-compose
+    when: docker_compose.stat.exists
+
+#  - name: Fetch latest docker-compose repo
+#    shell:  sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+#  - name: Provide docker-compose with permissions
+#    shell:  sudo chmod +x /usr/local/bin/docker-compose
+
+#  - name: Reboot Azure VM
+#    shell: "sleep 1 && reboot"
+#    async: 1
+#    poll: 0
