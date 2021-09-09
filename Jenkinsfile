@@ -9,7 +9,7 @@ pipeline{
         stage('Run Docker Compose'){
             steps{
                 echo "Running Job: ${env.JOB_NAME}\n build: ${env.BUILD_ID}"
-                sh 'chmod 666 /var/run/docker.sock'
+                sh 'sudo chmod 666 /var/run/docker.sock'
                 sh 'docker-compose --version'
                 sh 'docker-compose up -d'
                 sh 'docker ps -a'
