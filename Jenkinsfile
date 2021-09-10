@@ -1,11 +1,6 @@
 pipeline{
     agent any
     stages{
-        stage('Checkout SCM'){
-            steps{
-                git url: 'https://github.com/TestUser46543/example-voting-app.git'
-            }
-        }
 
         stage('SonarQube analysis') {
          steps {
@@ -20,6 +15,14 @@ pipeline{
              -D sonar.projectKey=sonarqube"
             }
           }
+        }
+
+        stage('Build images by dockerfiles'){
+            steps{
+                sh './buildImages.sh'
+                echo "Removing old containers if any"
+                sh 'docker rm -f redis db vote worker result'
+            }
         }
 
         stage('Run Docker Compose'){
