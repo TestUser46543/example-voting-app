@@ -6,6 +6,15 @@ pipeline{
                 git url: 'https://github.com/Akshat1902/example-voting-app.git'
             }
         }
+
+        stage('SonarQube Analysis') {
+          def scannerHome = tool 'sonarqube';
+          withSonarQubeEnv() {
+            sh "${scannerHome}/bin/sonar-scanner"
+          }
+        }
+
+
         stage('Run Docker Compose'){
             steps{
                 echo "Running Job: ${env.JOB_NAME}\n build: ${env.BUILD_ID}"
@@ -15,12 +24,6 @@ pipeline{
             }
         }
 
-        stage('SonarQube Analysis') {
-          def scannerHome = tool 'SonarScanner';
-          withSonarQubeEnv() {
-            sh "${scannerHome}/bin/sonar-scanner"
-          }
-        }
     }
 }
 
